@@ -203,6 +203,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_MAIN_BUTTON:
 		{
+								
+
 								char buffer[25600];
 								char bufferfin[25600];
 								char lit[2];
@@ -213,6 +215,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									sizeof(buffer) / sizeof(buffer[0]),
 									reinterpret_cast<LPARAM>(buffer));
 								FILE*A;
+								if (strlen(buffer) == 0){ MessageBox(hWnd, "Eroare,introduceti text.", "Error", MB_OK | MB_ICONERROR); break; }
+								else
+									MessageBox(hWnd, "Alegeti fisierul in care va fi stocata informatia rezultata.", "Browse", MB_OK | MB_ICONINFORMATION);
 								A = fopen("temp.txt", "w");
 								for (int i = 0; i < strlen(buffer); i++)
 								{
@@ -229,7 +234,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								int i, j = 0;
 								unsigned char c = char(1), b;
 								A = fopen("temp.txt", "rb");
-								FILE*B;
+								FILE*B=NULL;
 								while (fread(&c, sizeof(unsigned char), 1, A))
 								{
 									v = encrypt(c, 3);
@@ -271,6 +276,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (GetOpenFileName(&ofn))
 								{
 									B = fopen(szFileName, "wb");
+									if (B == NULL)break;
 									for (i = 0; i < strlen(bufferfin); i++)
 									{
 										
@@ -278,16 +284,16 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									}
 
 								}
-
-								fclose(B);
+								if(B!=NULL)fclose(B);
+								MessageBox(hWnd, "Criptat cu succes.", "Succes", MB_OK | MB_ICONINFORMATION);
 								break;
 		}
 
 
 		case IDC_MAIN_BUTTON2:
 		{
-							
-								FILE*A, *B;
+								 MessageBox(hWnd, "Alegeti fisierul din care se va incarca mesajul codat.", "Browse", MB_OK | MB_ICONINFORMATION);
+								FILE*A=NULL, *B=NULL;
 								OPENFILENAME ofn;
 								char szFileName[MAX_PATH] = "";
 
@@ -304,13 +310,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (GetOpenFileName(&ofn))
 								{
 									A = fopen(szFileName, "rb");
+									
 
 								}
 
-
+								if (A == NULL)break;
 								
 								
-
+								MessageBox(hWnd, "Alegeti fisierul in care va fi stocata informatia rezultata.", "Browse", MB_OK | MB_ICONINFORMATION);
 								ZeroMemory(&ofn, sizeof(ofn));
 
 								ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW
@@ -324,9 +331,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (GetOpenFileName(&ofn))
 								{
 									B = fopen(szFileName, "wb");
-
+									
 								}
-
+								if (B == NULL)break;
 
 								int* v = NULL;
 								int* rem = NULL;
@@ -367,7 +374,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								}
 								fclose(A);
 								fclose(B);
-
+								MessageBox(hWnd, "Decriptat cu succes.", "Succes", MB_OK | MB_ICONINFORMATION);
 
 
 								break;

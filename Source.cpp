@@ -287,6 +287,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (B == NULL)break;
 								if(B!=NULL)fclose(B);
 								MessageBox(hWnd, "Criptat cu succes.", "Succes", MB_OK | MB_ICONINFORMATION);
+						
+							SetWindowText(hEdit, "");
 								break;
 		}
 

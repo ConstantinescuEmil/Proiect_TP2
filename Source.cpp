@@ -73,6 +73,43 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	return 0;
 }
 
+BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
+{
+	HANDLE hFile;
+	BOOL bSuccess = FALSE;
+
+	hFile = CreateFile(pszFileName, GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		DWORD dwTextLength;
+
+		dwTextLength = GetWindowTextLength(hEdit);
+		// No need to bother if there's no text.
+		if (dwTextLength > 0)
+		{
+			LPSTR pszText;
+			DWORD dwBufferSize = dwTextLength + 1;
+
+			pszText = (LPSTR)GlobalAlloc(GPTR, dwBufferSize);
+			if (pszText != NULL)
+			{
+				if (GetWindowText(hEdit, pszText, dwBufferSize))
+				{
+					DWORD dwWritten;
+
+					if (WriteFile(hFile, pszText, dwTextLength, &dwWritten, NULL))
+						bSuccess = TRUE;
+				}
+				GlobalFree(pszText);
+			}
+		}
+		CloseHandle(hFile);
+	}
+	return bSuccess;
+}
+
+
 LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -167,14 +204,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case IDC_MAIN_BUTTON:
 		{
 								char buffer[25600];
+								char bufferfin[25600];
+								char lit[2];
+								lit[1] = '\0';
+								bufferfin[0] = '\0';
 								SendMessage(hEdit,
 									WM_GETTEXT,
 									sizeof(buffer) / sizeof(buffer[0]),
 									reinterpret_cast<LPARAM>(buffer));
-								MessageBox(NULL,
-									buffer,
-									"Information",
-									MB_ICONINFORMATION);
 								FILE*A;
 								A = fopen("temp.txt", "w");
 								for (int i = 0; i < strlen(buffer); i++)
@@ -182,6 +219,68 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									fprintf(A,"%c", buffer[i]);
 								}
 								fclose(A);
+
+
+
+								int* v = NULL;
+								int* rem = NULL;
+								int* descris = NULL;
+								int* decode = NULL;
+								int i, j = 0;
+								unsigned char c = char(1), b;
+								A = fopen("temp.txt", "rb");
+								FILE*B = fopen("out.txt", "wb");
+								while (fread(&c, sizeof(unsigned char), 1, A))
+								{
+									v = encrypt(c, 3);
+									concat(&rem, &v);
+									descris = impartire(v, &rem);
+									while (descris[0]>1)
+									{
+
+										b = char_codat(&descris);
+										//fwrite(&b, sizeof(unsigned char), 1, B);
+										lit[0] = b;
+										strcat(bufferfin, lit);
+
+									}
+									free(descris);
+								}
+								restfin(&rem);
+								b = char_codat(&rem);
+								//fwrite(&b, sizeof(unsigned char), 1, B);
+								lit[0] = b;
+								strcat(bufferfin, lit);
+								fclose(B);
+								fclose(A);
+								remove("temp.txt");
+								free(rem);
+
+								OPENFILENAME ofn;
+								char szFileName[MAX_PATH] = "";
+
+								ZeroMemory(&ofn, sizeof(ofn));
+
+								ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW
+								ofn.hwndOwner = hWnd;
+								ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+								ofn.lpstrFile = szFileName;
+								ofn.nMaxFile = MAX_PATH;
+								ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+								ofn.lpstrDefExt = "txt";
+
+								if (GetOpenFileName(&ofn))
+								{
+									B = fopen(szFileName, "wb");
+									for (i = 0; i < strlen(bufferfin); i++)
+									{
+										
+										fwrite(&(bufferfin[i]), sizeof(unsigned char), 1, B);
+									}
+
+								}
+
+
 								break;
 		}
 
@@ -204,6 +303,54 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									fprintf(A, "%c", buffer2[i]);
 								}
 								fclose(A);
+
+
+								int* v = NULL;
+								int* rem = NULL;
+								int* descris = NULL;
+								int* decode = NULL;
+								int i, j = 0;
+								unsigned char c = char(1), b;
+								A = fopen("temp.txt", "rb");
+								FILE*B = fopen("encode.txt", "wb");
+								v = NULL;
+								while (c != unsigned char(0))
+								{
+									decode = (int*)malloc(sizeof(int));
+									decode[0] = 1;
+									concat(&rem, &decode);
+									while (verif_ok(decode, 3) == 0)
+									{
+
+
+										if (fread(&c, sizeof(unsigned char), 1, A))
+										{
+											if (verif_ok(decode, 3) == 0)
+											{
+												v = obt_vct_codat(c);
+												bag_vect_la_sf(&decode, v);
+											}
+
+										}
+										else { c = unsigned char(0); break; }
+									}
+									while (verif_ok(decode, 3) == 1 && (!rest0(decode)))
+									{
+										b = obt_char(decode, 3);
+										fwrite(&b, sizeof(unsigned char), 1, B);
+										scindare(&decode, 3);
+										if (rest0(decode))c = unsigned char(0);
+									}
+									rem = (int*)malloc(sizeof(int));
+									rem[0] = 1;
+									concat(&decode, &rem);
+								}
+								fclose(A);
+								remove("temp.txt");
+								fclose(B);
+
+
+
 								break;
 								
 		}

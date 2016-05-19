@@ -276,7 +276,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (GetOpenFileName(&ofn))
 								{
 									B = fopen(szFileName, "wb");
-									if (B == NULL)break;
+									
 									for (i = 0; i < strlen(bufferfin); i++)
 									{
 										
@@ -284,6 +284,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									}
 
 								}
+								if (B == NULL)break;
 								if(B!=NULL)fclose(B);
 								MessageBox(hWnd, "Criptat cu succes.", "Succes", MB_OK | MB_ICONINFORMATION);
 								break;

@@ -1,5 +1,8 @@
 #include <windows.h>
-
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include"declarare_functii.h"
 #define IDC_MAIN_BUTTON	101			// Button identifier
 #define IDC_MAIN_EDIT	102			// Edit box identifier
 #define IDC_MAIN_BUTTON2 103
@@ -163,7 +166,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_MAIN_BUTTON:
 		{
-								char buffer[256];
+								char buffer[25600];
 								SendMessage(hEdit,
 									WM_GETTEXT,
 									sizeof(buffer) / sizeof(buffer[0]),
@@ -172,13 +175,20 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									buffer,
 									"Information",
 									MB_ICONINFORMATION);
+								FILE*A;
+								A = fopen("temp.txt", "w");
+								for (int i = 0; i < strlen(buffer); i++)
+								{
+									fprintf(A,"%c", buffer[i]);
+								}
+								fclose(A);
 								break;
 		}
 
 
 		case IDC_MAIN_BUTTON2:
 		{
-								char buffer2[256];
+								char buffer2[25600];
 								SendMessage(hEdit,
 									WM_GETTEXT,
 									sizeof(buffer2) / sizeof(buffer2[0]),
@@ -187,6 +197,13 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									buffer2,
 									"Information",
 									MB_ICONINFORMATION);
+								FILE*A;
+								A = fopen("temp.txt", "w");
+								for (int i = 0; i < strlen(buffer2); i++)
+								{
+									fprintf(A, "%c", buffer2[i]);
+								}
+								fclose(A);
 								break;
 								
 		}

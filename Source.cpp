@@ -120,8 +120,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					HWND statik=  CreateWindowEx(0,
 						  "STATIC",
 						  NULL,
-						  WS_CHILD | WS_VISIBLE,
-						  60, 10, 300, 200,
+						  WS_CHILD | WS_VISIBLE|SS_CENTER,
+						  40, 10, 300, 200,
 						  hWnd,
 						  NULL,
 						 NULL,
@@ -129,7 +129,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					
 					SetWindowText(
 						 statik,
-						 "Introduceti textul si alegeti modul dorit"
+						 "Pentru ctriptare introduceti textul si apasati \"Cripteaza\".\nPentru decriptare va trebui sa selectati un fisier din care textul va fi preluat automat."
 						);
 
 
@@ -229,7 +229,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								int i, j = 0;
 								unsigned char c = char(1), b;
 								A = fopen("temp.txt", "rb");
-								FILE*B = fopen("out.txt", "wb");
+								FILE*B;
 								while (fread(&c, sizeof(unsigned char), 1, A))
 								{
 									v = encrypt(c, 3);
@@ -251,7 +251,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								//fwrite(&b, sizeof(unsigned char), 1, B);
 								lit[0] = b;
 								strcat(bufferfin, lit);
-								fclose(B);
 								fclose(A);
 								remove("temp.txt");
 								free(rem);
@@ -280,29 +279,53 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 								}
 
-
+								fclose(B);
 								break;
 		}
 
 
 		case IDC_MAIN_BUTTON2:
 		{
-								char buffer2[25600];
-								SendMessage(hEdit,
-									WM_GETTEXT,
-									sizeof(buffer2) / sizeof(buffer2[0]),
-									reinterpret_cast<LPARAM>(buffer2));
-								MessageBox(NULL,
-									buffer2,
-									"Information",
-									MB_ICONINFORMATION);
-								FILE*A;
-								A = fopen("temp.txt", "w");
-								for (int i = 0; i < strlen(buffer2); i++)
+							
+								FILE*A, *B;
+								OPENFILENAME ofn;
+								char szFileName[MAX_PATH] = "";
+
+								ZeroMemory(&ofn, sizeof(ofn));
+
+								ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW
+								ofn.hwndOwner = hWnd;
+								ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+								ofn.lpstrFile = szFileName;
+								ofn.nMaxFile = MAX_PATH;
+								ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+								ofn.lpstrDefExt = "txt";
+
+								if (GetOpenFileName(&ofn))
 								{
-									fprintf(A, "%c", buffer2[i]);
+									A = fopen(szFileName, "rb");
+
 								}
-								fclose(A);
+
+
+								
+								
+
+								ZeroMemory(&ofn, sizeof(ofn));
+
+								ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW
+								ofn.hwndOwner = hWnd;
+								ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+								ofn.lpstrFile = szFileName;
+								ofn.nMaxFile = MAX_PATH;
+								ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+								ofn.lpstrDefExt = "txt";
+
+								if (GetOpenFileName(&ofn))
+								{
+									B = fopen(szFileName, "wb");
+
+								}
 
 
 								int* v = NULL;
@@ -311,9 +334,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								int* decode = NULL;
 								int i, j = 0;
 								unsigned char c = char(1), b;
-								A = fopen("temp.txt", "rb");
-								FILE*B = fopen("encode.txt", "wb");
-								v = NULL;
 								while (c != unsigned char(0))
 								{
 									decode = (int*)malloc(sizeof(int));
@@ -346,7 +366,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 									concat(&decode, &rem);
 								}
 								fclose(A);
-								remove("temp.txt");
 								fclose(B);
 
 

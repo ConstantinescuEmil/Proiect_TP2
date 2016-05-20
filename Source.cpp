@@ -218,13 +218,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								if (strlen(buffer) == 0){ MessageBox(hWnd, "Eroare,introduceti text.", "Error", MB_OK | MB_ICONERROR); break; }
 								else
 									MessageBox(hWnd, "Alegeti fisierul in care va fi stocata informatia rezultata.", "Browse", MB_OK | MB_ICONINFORMATION);
-								A = fopen("temp.txt", "w");
-								for (int i = 0; i < strlen(buffer); i++)
-								{
-									fprintf(A,"%c", buffer[i]);
-								}
-								fclose(A);
-
 
 
 								int* v = NULL;
@@ -233,10 +226,11 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								int* decode = NULL;
 								int i, j = 0;
 								unsigned char c = char(1), b;
-								A = fopen("temp.txt", "rb");
+								
 								FILE*B=NULL;
-								while (fread(&c, sizeof(unsigned char), 1, A))
+								for (int i = 0; i< strlen(buffer); i++)
 								{
+									c = buffer[i];
 									v = encrypt(c, 3);
 									concat(&rem, &v);
 									descris = impartire(v, &rem);
@@ -256,8 +250,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								//fwrite(&b, sizeof(unsigned char), 1, B);
 								lit[0] = b;
 								strcat(bufferfin, lit);
-								fclose(A);
-								remove("temp.txt");
+			
 								free(rem);
 
 								OPENFILENAME ofn;
